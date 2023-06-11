@@ -1,13 +1,12 @@
 <template>
-  <v-app class="bg-grey-darken-3">
-    <v-navigation-drawer expand-on-hover rail app permanent class="bg-grey-darken-4">
-      <v-list>
-        <v-list-item prepend-icon="mdi-account" title="user" subtitle="user@user.com"></v-list-item>
-      </v-list>
+  <v-app id="inspire" app>
+    <v-app-bar elevation="0">
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-divider></v-divider>
-
-      <v-list density="compact" nav app>
+      <v-toolbar-title></v-toolbar-title>
+    </v-app-bar>
+    <v-navigation-drawer width="200" floating v-model="drawer" app>
+      <v-list nav>
         <v-list-item
           prepend-icon="mdi-view-dashboard"
           title="Dashboard"
@@ -15,18 +14,71 @@
           to="/"
           link
         ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-calendar"
+          title="Planning"
+          value="planning"
+          to="/planning"
+          link
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-account-multiple"
+          title="Contacts"
+          value="contact"
+          to="/contact"
+          link
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-weather-cloudy"
+          title="Météo"
+          value="meteo"
+          to="/meteo"
+          link
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
+
     <v-main>
-      <RouterView></RouterView>
+      <router-view></router-view>
     </v-main>
+
+    <v-footer app>
+      <v-row justify="center" no-gutters height="1">
+        <v-btn
+          v-for="link in links"
+          :key="link.text"
+          :href="link.url"
+          variant="text"
+          class="mx-2"
+          link
+          :target="link.external ? '_blank' : '_self'"
+        >
+          {{ link.name }}
+        </v-btn>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
 export default {
-  data() {
-    return {}
-  }
+  name: 'App',
+  data: () => ({
+    drawer: true,
+    links: [
+      { name: 'home', url: '/' },
+      { name: 'about me', url: '/mon portfolio' },
+      { name: 'github', url: 'https://github.com/romainniamor', external: true },
+      {
+        name: 'linkedin',
+        url: 'https://www.linkedin.com/in/romain-navoret-559480274/',
+        external: true
+      }
+    ]
+  })
 }
 </script>
+
+<style>
+@import './assets/base.css';
+</style>
