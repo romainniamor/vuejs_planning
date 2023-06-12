@@ -18,14 +18,8 @@
 }
 
 .card-box {
-  width: 420px;
-  height: 480px;
   padding: 20px;
   background-color: #fbfbfb;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
   border-radius: 15px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -33,7 +27,7 @@
 }
 
 .card-box:hover {
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   transform: translateY(-2px);
 }
 
@@ -49,6 +43,7 @@ h1 {
 h3 {
   font-size: 1.3em;
   color: #9f9f9f;
+  text-transform: uppercase;
 }
 
 .card-box-content {
