@@ -7,65 +7,130 @@
     </div>
   </div>
 </template>
-
 <script>
 import Chart from 'chart.js/auto'
-import { onMounted, ref } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
+import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 export default {
-  setup() {
+  props: {
+    period: Array,
+    temperature: Array
+  },
+
+  setup(props) {
+    // réf de période -> copie de props.period
+    const periodRef = ref([...props.period])
+
+    // conversion périod en jour
+    const daysFromPeriod = computed(() =>
+      periodRef.value.map((period) => {
+        if (period === -1) return 'jour non défini.'
+        if (period < -1 || period > 7) return 'Période incorrecte'
+
+        const today = new Date()
+        const dateFromPeriod = new Date()
+        dateFromPeriod.setDate(today.getDate() + period)
+
+        let jours_semaine = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.']
+
+        return jours_semaine[dateFromPeriod.getDay()]
+      })
+    )
+    // Maj de ref de périod lorsque props.period change
+    watch(
+      () => props.period,
+      (newPeriod) => {
+        periodRef.value = [...newPeriod]
+      },
+      { immediate: true }
+    )
+
+    // réf du graph
     const myChart = ref(null)
 
+    // Quand le composant est monté alors...
     onMounted(() => {
+      const data = props.temperature
+      const label = props.period
+
+      // calcule de la moy des données pour def le max et min y et color
+      const sum = data.reduce((a, b) => a + b, 0)
+      console.log(sum)
+      const moy = sum / data.length
+      console.log('moy:', moy)
+
+      // couleur de fond en fonction de la moyenne
+      let bgColor
+      if (moy > 18) {
+        bgColor = '#B3E5FC'
+      } else {
+        bgColor = '#81D4FA'
+      }
+
+      // definition du graph
       new Chart(myChart.value, {
         type: 'line',
         data: {
-          labels: ['lun', 'mar', 'mer', 'jeu', 'vend', 'sam', 'dim'],
-
+          labels: daysFromPeriod.value,
           datasets: [
             {
-              label: '',
-              data: [25, 23, 18, 29, 23, 19, 28],
+              label: label,
+              data: data,
               fill: true,
-              backgroundColor: '#F8BBD0',
-              tension: 0.5
+              backgroundColor: bgColor,
+              tension: 0.4
             }
           ]
         },
-
         options: {
+          maintainAspectRatio: false, // Désactiver le maintien du ratio d'aspect
           plugins: {
             legend: {
               display: false
+            },
+            tooltip: {
+              enabled: false
+            },
+            datalabels: {
+              // inscription des data au niv du point
+              align: 'end',
+              anchor: 'end',
+              formatter: function (value, context) {
+                return value
+              }
             }
           },
           elements: {
             point: {
-              radius: 0 // rend les points invisibles
+              radius: 5 // largeur pts
             },
             line: {
-              borderWidth: 4 // défini la largeur de la ligne
+              borderWidth: 4 // largeur line
             }
           },
           scales: {
             y: {
               display: false,
-              suggestedMin: 0,
-              suggestedMax: 40,
+
+              suggestedMin: moy - 10,
+              suggestedMax: moy + 10,
               grid: {
                 display: false
               },
               ticks: {
-                display: false // cache les données d'échelle sur l'axe des y
+                display: false, // cache les données d'échelle  y
+                stepSize: 50
               }
             },
             x: {
               grid: {
-                display: false // supprime les grilles de l'axe des y
+                display: false // supprime grilles
               }
             }
           }
-        }
+        },
+        plugins: [ChartDataLabels] //plugin necessaire pour remplacer les pts par data correspondante
       })
     })
 
@@ -78,10 +143,10 @@ export default {
 
 <style>
 .graph-temps-container {
-  width: 50%;
+  width: 880px;
 }
 .donut-box {
   width: 100%;
-  height: 100%;
+  height: 250px;
 }
 </style>
