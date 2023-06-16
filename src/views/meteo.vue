@@ -1,13 +1,14 @@
 <template>
-  <div class="container meteo-view">
+  <div class="container meteo-view" :class="dark ? 'theme--dark' : 'theme--light'">
     <meteoHeroBanner
       :period="weatherData[0].period"
       :temperature="weatherData[0].temperature"
       :rain="weatherData[0].precipitation"
       :humidity="weatherData[0].humidite"
       :weatherStatus="weatherData[0].weatherStatus"
+      :wind="weatherData[0].vent"
     ></meteoHeroBanner>
-    <meteoGraphTemp :period="period" :temperature="temperature"></meteoGraphTemp>
+    <meteoChart :period="period" :temperature="temperature"></meteoChart>
     <div class="cards-display">
       <div v-for="data in this.weatherData">
         <meteoCard
@@ -24,17 +25,18 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import meteoHeroBanner from '../components/meteo/meteoHeroBanner.vue'
-import meteoGraphTemp from '../components/meteo/meteoGraphTemp.vue'
+import meteoChart from '../components/meteo/meteoChart.vue'
 import meteoCard from '../components/meteo/meteoCard.vue'
 
 export default defineComponent({
   name: 'meteo',
   components: {
     meteoHeroBanner,
-    meteoGraphTemp,
+    meteoChart,
     meteoCard
   },
   setup() {
+    const dark = ref(false)
     const selectedPeriod = ref(null)
 
     const selectPeriod = (data) => {
@@ -139,7 +141,6 @@ export default defineComponent({
 
 <style>
 .meteo-view {
-  background-color: #fce4ec;
   display: flex;
   flex-direction: column;
   gap: 10px;

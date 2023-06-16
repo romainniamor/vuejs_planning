@@ -1,9 +1,12 @@
 <template>
-  <v-app id="inspire" app>
+  <v-app id="inspire" app :theme="dark ? 'dark' : 'light'">
     <v-app-bar elevation="0">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <v-toolbar-title></v-toolbar-title>
+      <v-btn icon @click="toggleDarkMode">
+        <v-icon>{{ dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
+      </v-btn>
     </v-app-bar>
     <v-navigation-drawer width="200" floating v-model="drawer" app>
       <v-list nav>
@@ -63,8 +66,10 @@
 <script>
 export default {
   name: 'App',
+
   data: () => ({
     drawer: true,
+    dark: true,
     links: [
       { name: 'home', url: '/' },
       { name: 'about me', url: '/mon portfolio' },
@@ -75,7 +80,12 @@ export default {
         external: true
       }
     ]
-  })
+  }),
+  methods: {
+    toggleDarkMode() {
+      this.dark = !this.dark
+    }
+  }
 }
 </script>
 

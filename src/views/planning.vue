@@ -6,7 +6,7 @@
 
 <style>
 .planning-view {
-  background-color: #cfd8dc;
+  background: transparent;
 }
 </style>
 

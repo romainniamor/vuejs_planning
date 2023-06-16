@@ -1,20 +1,26 @@
 <template>
   <div class="container contact-view">
-    <h1>Contact</h1>
+    <contactBanner></contactBanner>
+    <contactHeader></contactHeader>
   </div>
 </template>
 
-<style>
-.contact-view {
-  background-color: #b2ebf2;
-}
-</style>
-
 <script>
 import { defineComponent } from 'vue'
+import contactBanner from '../components/contacts/contactHeroBanner.vue'
+import contactHeader from '../components/contacts/contactsHeader.vue'
 
 export default defineComponent({
   name: 'contact',
-  components: {}
+  components: {
+    contactBanner,
+    contactHeader
+  }
 })
 </script>
+
+<style>
+.contact-view {
+  width: 100%;
+}
+</style>

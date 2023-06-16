@@ -11,6 +11,10 @@
   font-weight: normal;
 }
 
+#inspire {
+  transition: background 1s ease-in-out;
+}
+
 .container {
   width: 100%;
   height: 100%;
@@ -19,7 +23,6 @@
 
 .card-box {
   padding: 20px;
-  background-color: #fbfbfb;
   border-radius: 15px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -29,11 +32,11 @@
 .card-box:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   transform: translateY(-2px);
+  background: transparent;
 }
 
 .card-box-header {
   width: 100%;
-  background: blue;
 }
 
 h1 {
@@ -50,5 +53,35 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: green;
+}
+
+.hero-banner-card {
+  width: 880px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.left-col {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.right-col {
+  direction: rtl;
+}
+
+.col-right,
+.title {
+  font-weight: 700;
+  font-size: 2.2em;
+}
+
+.col-right,
+p {
+  font-weight: 500;
+  color: #7a7a7a;
+  line-height: normal;
 }

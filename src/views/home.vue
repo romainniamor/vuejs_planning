@@ -7,7 +7,7 @@
 
 <style>
 .home-view {
-  background-color: #fbe9e7;
+  background: transparent;
 }
 </style>
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="card-box hero-banner-meteo">
+  <div class="card-box hero-banner-card">
     <div class="left-col">
       <img v-if="this.weatherStatus === this.STATUT_API_NUAGEUX" :src="nuageux" />
       <img v-if="this.weatherStatus === this.STATUT_API_PEU_NUAGEUX" :src="nuageux" />
@@ -97,20 +97,6 @@ export default {
 </script>
 
 <style>
-.hero-banner-meteo {
-  width: 880px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.left-col {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .temp {
   font-size: 3em;
   position: relative;
@@ -120,7 +106,7 @@ export default {
   content: '°C';
   position: absolute;
   top: 13px;
-  right: -10px;
+  right: -15px;
   font-size: 18px;
   font-weight: 600;
 }
@@ -136,22 +122,5 @@ img {
   font-size: 0.7em;
   font-weight: 600;
   color: #7a7a7a;
-}
-
-.right-col {
-  direction: rtl;
-}
-
-.col-right,
-.title {
-  font-weight: 700;
-  font-size: 2.2em;
-}
-
-.col-right,
-p {
-  font-weight: 500;
-  color: #7a7a7a;
-  line-height: normal;
 }
 </style>
