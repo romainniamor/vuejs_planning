@@ -1,11 +1,16 @@
 <template>
-  <div v-for="contact in contacts" class="card-box card-contact-header">
-    <contactList
-      :firstName="contact.firstName"
-      :lastName="contact.lastName"
-      :mail="contact.mail"
-      :tel="contact.tel"
-    ></contactList>
+  <div class="card-contact-header">
+    <br />
+
+    <div v-for="contact in contacts" class="card-box">
+      <contactList
+        :firstName="contact.firstName"
+        :lastName="contact.lastName"
+        :mail="contact.mail"
+        :tel="contact.tel"
+      ></contactList>
+    </div>
+    <ContactForm></ContactForm>
   </div>
 </template>
 
@@ -13,64 +18,66 @@
 import { defineComponent } from 'vue'
 import contactList from './contactsList.vue'
 import contactForm from './contactForm.vue'
+import ContactForm from './contactForm.vue'
 
 export default defineComponent({
   name: 'contactHeader',
   components: {
     contactForm,
-    contactList
+    contactList,
+    ContactForm
   },
   data() {
     return {
       contacts: [
         {
           img: '',
-          firstName: 'John',
-          lastName: 'Doe',
-          mail: 'jd@mail.com',
-          tel: '03XXXXXXXX'
+          firstName: 'Nikola',
+          lastName: 'Jokic',
+          mail: 'joker@mail.com',
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
           firstName: 'Elena',
           lastName: 'Sanchez',
           mail: 'elena@mail.com',
-          tel: '03XXXXXXXX'
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
-          firstName: 'Mike',
-          lastName: 'Simpson',
-          mail: 'jd@mail.com',
-          tel: '03XXXXXXXX'
+          firstName: 'Jamal',
+          lastName: 'Murray',
+          mail: 'jm@mail.com',
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
           firstName: 'Pierre',
           lastName: 'Martin',
           mail: 'pmartin@mail.fr',
-          tel: '06XXXXXXXX'
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
           firstName: 'Lebron',
           lastName: 'James',
           mail: 'mariaAl@mail.ch',
-          tel: '03XXXXXXXX'
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
           firstName: 'Allen',
           lastName: 'Iverson',
-          mail: 'mariaAl@mail.ch',
-          tel: '03XXXXXXXX'
+          mail: 'answer@mail.ch',
+          tel: 'XXXXXXXXXX'
         },
         {
           img: '',
           firstName: 'Chris',
           lastName: 'Webber',
-          mail: 'mariaAl@mail.ch',
-          tel: '03XXXXXXXX'
+          mail: 'webb@mail.ch',
+          tel: 'XXXXXXXXXX'
         }
       ]
     }

@@ -1,142 +1,115 @@
 <template>
-  <div class="container meteo-view" :class="dark ? 'theme--dark' : 'theme--light'">
-    <meteoHeroBanner
-      :period="weatherData[0].period"
-      :temperature="weatherData[0].temperature"
-      :rain="weatherData[0].precipitation"
-      :humidity="weatherData[0].humidite"
-      :weatherStatus="weatherData[0].weatherStatus"
-      :wind="weatherData[0].vent"
-    ></meteoHeroBanner>
-    <meteoChart :period="period" :temperature="temperature"></meteoChart>
-    <div class="cards-display">
-      <div v-for="data in this.weatherData">
-        <meteoCard
-          :period="data.period"
-          :weather-status="data.weatherStatus"
-          :minTemp="data.minTemp"
-          :maxTemp="data.maxTemp"
-        ></meteoCard>
+  <main class="container meteo-view">
+    <v-form class="city-search">
+      <v-text-field
+        density="compact"
+        label="Your City"
+        type="text"
+        variant="outlined"
+        v-model="searchQuery"
+        @input="getSearchResults"
+      ></v-text-field>
+      <ul v-if="mapBoxSearchResults" class="search-wrapper">
+        <li v-if="searchError">Un problème est survenu. Réessayez ultérieurement</li>
+        <li v-if="mapBoxSearchResults.length === 0">Aucun résultat</li>
+        <template v-else>
+          <li
+            v-for="searchResult in mapBoxSearchResults"
+            :key="searchResult.id"
+            @click="previewCity(searchResult)"
+          >
+            {{ searchResult.place_name }}
+          </li>
+        </template>
+      </ul>
+    </v-form>
+    <div class="meteo-component-wrapper" v-if="weatherData">
+      <MeteoHeroBanner
+        :temperature="weatherData.current.temp"
+        :pressure="weatherData.current.pressure"
+        :weather-status="weatherData.current.weather[0].description"
+        :wind="weatherData.current.wind_speed"
+        :humidity="weatherData.current.humidity"
+        :icon="weatherData.current.weather[0].icon"
+        :city="city"
+      >
+      </MeteoHeroBanner>
+      <div class="meteo-card-wrapper">
+        <DailyMeteoCard
+          v-for="(day, index) in weatherData.daily.slice(1, 8)"
+          :key="day"
+          :period="index"
+          :min-temp="day.temp.min"
+          :max-temp="day.temp.max"
+          :icon="day.weather[0].icon"
+        ></DailyMeteoCard>
       </div>
     </div>
-  </div>
+  </main>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
-import meteoHeroBanner from '../components/meteo/meteoHeroBanner.vue'
-import meteoChart from '../components/meteo/meteoChart.vue'
-import meteoCard from '../components/meteo/meteoCard.vue'
+<script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+import MeteoHeroBanner from '../components/meteo/meteoHeroBanner.vue'
+import DailyMeteoCard from '../components/meteo/meteoCard.vue'
 
-export default defineComponent({
-  name: 'meteo',
-  components: {
-    meteoHeroBanner,
-    meteoChart,
-    meteoCard
-  },
-  setup() {
-    const dark = ref(false)
-    const selectedPeriod = ref(null)
+const mapBoxApiKey =
+  'pk.eyJ1Ijoicm9tYWlubmlhbW9yIiwiYSI6ImNsajQ5ZWFrYzAwNzIzcnRlaGRvc2diYTkifQ.nz4mbhqEK8uvdnw2pxuCpQ'
 
-    const selectPeriod = (data) => {
-      selectedPeriod.value = data
-    }
+const searchQuery = ref('')
+const queryTimeout = ref(null)
+const searchError = ref(null)
 
-    return {
-      selectedPeriod,
-      selectPeriod
-    }
-  },
+const mapBoxSearchResults = ref(null)
+const weatherData = ref(null)
+const city = ref('')
 
-  data() {
-    return {
-      weatherData: [
-        {
-          period: 0,
-          temperature: 26,
-          maxTemp: 28,
-          minTemp: 23,
-          vent: 15,
-          humidite: 30,
-          precipitation: 10,
-          weatherStatus: 'ciel dégagé'
-        },
-        {
-          period: 1,
-          temperature: 24,
-          maxTemp: 25,
-          minTemp: 21,
-          vent: 10,
-          humidite: 28,
-          precipitation: 5,
-          weatherStatus: 'ciel dégagé'
-        },
-        {
-          period: 2,
-          temperature: 20,
-          maxTemp: 23,
-          minTemp: 18,
-          vent: 35,
-          humidite: 60,
-          precipitation: 40,
-          weatherStatus: 'légère pluie'
-        },
-        {
-          period: 3,
-          temperature: 25,
-          maxTemp: 27,
-          minTemp: 18,
-          vent: 5,
-          humidite: 26,
-          precipitation: 17,
-          weatherStatus: 'partiellement nuageux'
-        },
-        {
-          period: 4,
-          temperature: 24,
-          maxTemp: 28,
-          minTemp: 23,
-          vent: 15,
-          humidite: 30,
-          precipitation: 50,
-          weatherStatus: 'pluie modérée'
-        },
-        {
-          period: 5,
-          temperature: 22,
-          maxTemp: 24,
-          minTemp: 20,
-          vent: 17,
-          humidite: 20,
-          precipitation: 30,
-          weatherStatus: 'partiellement nuageux'
-        },
-        {
-          period: 6,
-          temperature: 28,
-          maxTemp: 29,
-          minTemp: 23,
-          vent: 12,
-          humidite: 10,
-          precipitation: 10,
-          weatherStatus: 'ciel dégagé'
-        }
-      ]
+// Recherche de la ville avec l'API Mapbox
+const getSearchResults = () => {
+  clearTimeout(queryTimeout.value)
+  queryTimeout.value = setTimeout(async () => {
+    if (searchQuery.value !== '') {
+      try {
+        const result = await axios.get(
+          `https://api.mapbox.com/geocoding/v5/mapbox.places/${searchQuery.value}.json?access_token=${mapBoxApiKey}&types=place`
+        )
+        mapBoxSearchResults.value = result.data.features
+        console.log(mapBoxSearchResults.value)
+      } catch (error) {
+        searchError.value = true
+      }
+      return
     }
-  },
-  computed: {
-    period() {
-      return this.weatherData.map((item) => item.period)
-    },
-    temperature() {
-      return this.weatherData.map((item) => item.temperature)
-    },
-    created() {
-      this.selectedPeriod = this.weatherData[0]
-    }
+    mapBoxSearchResults.value = null
+  }, 500)
+}
+
+const previewCity = (searchResult) => {
+  // Récupération du nom de la ville et de la région
+  city.value = searchResult.text
+  // Récupération des coordonnées géographiques pour l'API OpenWeatherMap
+  const cityLat = searchResult.geometry.coordinates[1]
+  const cityLong = searchResult.geometry.coordinates[0]
+
+  getWeatherData(cityLat, cityLong)
+  searchQuery.value = ''
+  mapBoxSearchResults.value = null
+}
+
+const getWeatherData = async (cityLat, cityLong) => {
+  try {
+    console
+    const weatherMapApiKey = 'fe363e73b02953fa60e480d23b5f6009'
+    const res = await axios.get(
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=fe363e73b02953fa60e480d23b5f6009`
+    )
+    weatherData.value = res.data
+    console.log('dataApi:', weatherData.value)
+  } catch (error) {
+    console.log(error)
   }
-})
+}
 </script>
 
 <style>
@@ -144,15 +117,29 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 1000px;
 }
 
-.cards-display {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 5px;
+.city-search {
+  position: relative;
+}
 
-  width: 880px;
-  justify-content: center;
+.search-wrapper {
+  position: absolute;
+  left: 0;
+  top: 42px;
+  width: 100%;
+  padding: 10px;
+  color: #b0b0b0;
+  height: auto;
+  list-style: none;
+  background-color: rgba(45, 45, 45);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  z-index: 1;
+}
+
+.search-wrapper li {
+  cursor: pointer;
 }
 </style>

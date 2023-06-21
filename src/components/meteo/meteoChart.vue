@@ -1,6 +1,8 @@
 <template>
   <div class="card-box chart-container">
-    <h3 class="graph-title">Températures</h3>
+    <div class="graph-title">
+      <v-btn variant="tonal"> temperatures </v-btn><v-btn variant="tonal"> precipitations </v-btn>
+    </div>
     <div class="chart-box">
       <Line :data="chartData" :options="chartOptions" />
     </div>
@@ -115,10 +117,15 @@ export default {
 
 <style>
 .chart-container {
-  width: 880px;
+  width: 100%;
 }
 .chart-box {
   width: 100%;
   height: 250px;
+}
+
+.graph-title {
+  display: flex;
+  gap: 10px;
 }
 </style>

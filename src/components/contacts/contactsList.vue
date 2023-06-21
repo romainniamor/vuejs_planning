@@ -1,9 +1,8 @@
 <template>
   <div class="list-item">
     <div class="content">
-      <div class="img-profile">
-        <img src="" alt="Img profil" />
-      </div>
+      <v-btn class="mx-3" color="green" size="x-large" icon="mdi mdi-account-outline"></v-btn>
+
       <div class="name element">
         <p class="first-name">{{ firstName }}</p>
         <p class="last-name">{{ lastName }}</p>
