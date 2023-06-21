@@ -55,7 +55,7 @@ import MeteoHeroBanner from '../components/meteo/meteoHeroBanner.vue'
 import DailyMeteoCard from '../components/meteo/meteoCard.vue'
 
 const mapBoxApiKey =
-  'pk.eyJ1Ijoicm9tYWlubmlhbW9yIiwiYSI6ImNsajQ5ZWFrYzAwNzIzcnRlaGRvc2diYTkifQ.nz4mbhqEK8uvdnw2pxuCpQ'
+  ''
 
 const searchQuery = ref('')
 const queryTimeout = ref(null)
@@ -100,9 +100,9 @@ const previewCity = (searchResult) => {
 const getWeatherData = async (cityLat, cityLong) => {
   try {
     console
-    const weatherMapApiKey = 'fe363e73b02953fa60e480d23b5f6009'
+    const weatherMapApiKey = 'f'
     const res = await axios.get(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=fe363e73b02953fa60e480d23b5f6009`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=`
     )
     weatherData.value = res.data
     console.log('dataApi:', weatherData.value)
