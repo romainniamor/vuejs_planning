@@ -119,7 +119,7 @@ const getWeatherData = async (cityLat, cityLong) => {
   hourlyHours.value = [] // liste maj
   try {
     console
-    const weatherMapApiKey = ''
+    const weatherMapApiKey = 'fe363e73b02953fa60e480d23b5f6009'
     const res = await axios.get(
       `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=`
     )
