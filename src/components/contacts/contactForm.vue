@@ -1,79 +1,106 @@
 <template>
-  <form @keydown.enter.prevent="submit" class="card-box contact-form">
+  <form class="card-box contact-form">
     <div class="contact-form-banner">
       <h1>New Contact</h1>
-      <v-btn class="ma-2 upload-btn" color="green" size="x-large" icon="mdi mdi-upload"></v-btn>
     </div>
     <br />
     <v-text-field
-      v-for="(fieldData, index) in fields"
-      :key="index"
-      v-model="fieldData.field.value"
-      :error-messages="fieldData.field.errorMessage"
-      :label="fieldData.label"
-      variant="outlined"
+      v-model="state.firstName"
+      :error-messages="v$?.firstName?.$errors.map((e) => e.$message)"
+      label="First Name"
+      required
+      @input="v$?.firstName?.$touch"
+      @blur="v$?.firstName?.$touch"
+      variant="solo-inverted"
+    ></v-text-field>
+    <v-text-field
+      v-model="state.lastName"
+      :error-messages="v$?.lastName?.$errors.map((e) => e.$message)"
+      label="Last Name"
+      @input="v$?.lastName?.$touch"
+      @blur="v$?.lastName?.$touch"
+      variant="solo-inverted"
     ></v-text-field>
 
-    <v-btn class="ma-3" type="submit" color="info"> Add </v-btn>
-    <v-btn @click="reset"> Clear </v-btn>
+    <v-text-field
+      v-model="state.email"
+      :error-messages="v$?.email?.$errors.map((e) => e.$message)"
+      label="E-mail"
+      @input="v$?.email?.$touch"
+      @blur="v$?.email?.$touch"
+      variant="solo-inverted"
+    ></v-text-field>
+    <v-text-field
+      v-model="state.phone"
+      :error-messages="v$?.phone?.$errors.map((e) => e.$message)"
+      label="Phone Number"
+      @input="v$?.phone?.$touch"
+      @blur="v$?.phone?.$touch"
+      variant="solo-inverted"
+    ></v-text-field>
+
+    <v-select
+      v-model="state.select"
+      :items="items"
+      :error-messages="v$?.select?.$errors.map((e) => e.$message)"
+      label="Category"
+      @change="v$?.select?.$touch"
+      @blur="v$?.select?.$touch"
+      variant="solo-inverted"
+    ></v-select>
+
+    <v-btn class="me-4" @click="v$?.$validate"> submit </v-btn>
+    <v-btn class="me-4" @click="clear"> clear </v-btn>
+    <v-btn class="me-4" @click="backPage"> Back </v-btn>
   </form>
 </template>
 
-<script>
-import { useField, useForm } from 'vee-validate'
+<script setup>
+import { reactive } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { email, required } from '@vuelidate/validators'
+import { useRouter } from 'vue-router'
 
-export default {
-  data() {
-    const { handleSubmit, reset } = useForm({
-      validationSchema: {
-        firstName(value) {
-          if (value?.length >= 2) return true
+const router = useRouter()
 
-          return 'Name needs to be at least 2 characters.'
-        },
-        lastName(value) {
-          if (value?.length >= 2) return true
+const initialState = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  select: null
+}
 
-          return 'Name needs to be at least 2 characters.'
-        },
-        phone(value) {
-          if (value?.length > 0) {
-            if (value?.length > 9 && /[0-9-]+/.test(value)) return true
+const state = reactive({
+  ...initialState
+})
 
-            return 'Phone number needs to be at least 9 digits.'
-          }
-          return true
-        },
-        email(value) {
-          if (value === '') {
-            return true
-          } else if (/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(value)) return true
+const items = ['Business', 'Familly', 'Personal']
 
-          return 'Must be a valid e-mail.'
-        }
-      }
-    })
+const rules = {
+  firstName: { required },
+  email: { email },
+  phone: {}
+}
 
-    return {
-      // inputs
-      fields: [
-        { field: useField('firstName'), label: 'First Name' },
-        { field: useField('lastName'), label: 'Last Name' },
-        { field: useField('phone'), label: 'Phone Number' },
-        { field: useField('email'), label: 'E-mail' }
-      ],
-      submit: handleSubmit((values) => {
-        alert(JSON.stringify(values, null, 2))
-      }),
-      reset
-    }
+const v$ = useVuelidate(rules, state)
+
+function clear() {
+  v$?.value?.$reset()
+
+  for (const [key, value] of Object.entries(initialState)) {
+    state[key] = value
   }
+}
+
+function backPage() {
+  router.go(-1)
 }
 </script>
 
 <style>
 .contact-form {
-  width: 100%;
+  width: 600px;
 }
 
 .contact-form-banner {

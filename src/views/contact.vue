@@ -1,19 +1,18 @@
 <template>
   <div class="container contact-view">
-    <contactBanner></contactBanner>
-    <contactHeader></contactHeader>
+    <contactHeader />
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import { defineComponent } from 'vue'
-import contactBanner from '../components/contacts/contactHeroBanner.vue'
+
 import contactHeader from '../components/contacts/contactsHeader.vue'
 
 export default defineComponent({
-  name: 'contact',
+  name: 'contacts',
   components: {
-    contactBanner,
     contactHeader
   }
 })

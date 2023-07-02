@@ -27,8 +27,8 @@
         <v-list-item
           prepend-icon="mdi-account-multiple"
           title="Contacts"
-          value="contact"
-          to="/contact"
+          value="contacts"
+          to="/contacts"
           link
         ></v-list-item>
         <v-list-item

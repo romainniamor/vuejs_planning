@@ -1,7 +1,14 @@
 <template>
   <div class="list-item">
     <div class="content">
-      <v-btn class="mx-3" color="green" size="x-large" icon="mdi mdi-account-outline"></v-btn>
+      <v-btn
+        class="mx-3 font-weight-bold"
+        :color="getButtonColor(cat)"
+        size="large"
+        icon="mdi-account-outline"
+        @click="getContactInfo()"
+        >{{ getButtonContent(firstName) }}</v-btn
+      >
 
       <div class="name element">
         <p class="first-name">{{ firstName }}</p>
@@ -13,7 +20,20 @@
       </div>
     </div>
     <div class="action-btns">
-      <v-btn icon="mdi-delete-outline"></v-btn>
+      <v-dialog v-model="dialog" width="auto">
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-delete-outline"></v-btn>
+        </template>
+
+        <v-card>
+          <v-card-text> Are you sure you want to delete this contact? </v-card-text>
+          <v-card-actions>
+            <v-btn variant="tonal" @click="dialog = false">Cancel </v-btn>
+            <v-btn variant="tonal" @click="">Validate </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
       <v-btn icon="mdi-pencil-outline"></v-btn>
     </div>
   </div>
@@ -24,11 +44,52 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'listItem',
+  data() {
+    return {
+      dialog: false
+    }
+  },
   props: {
     firstName: String,
     lastName: String,
     mail: String,
-    tel: String
+    tel: String,
+    cat: String
+  },
+  methods: {
+    //def de la couleur de l icone en fonction de la categorie du contact
+    getButtonColor(cat) {
+      if (cat === 'pro') {
+        return '#3949AB'
+      } else if (cat === 'fam') {
+        return '#7C4DFF'
+      } else if (cat === 'perso') {
+        return '#EF9A9A'
+      } else {
+        return '#4CAF50'
+      }
+    },
+
+    // affichage de la premiere lettre du prenom dans l icone
+    getButtonContent(firstName) {
+      return firstName[0]
+    },
+
+    // push vers template contact_card
+    getContactInfo() {
+      const contactInfo = {
+        contactI: this.firstName[0],
+        firstName: this.firstName,
+        lastName: this.lastName,
+        mail: this.mail,
+        tel: this.tel,
+        color: this.getButtonColor(this.cat)
+      }
+
+      console.log(contactInfo.firstName, contactInfo.lastName)
+
+      this.$router.push({ name: 'contactCard', query: contactInfo })
+    }
   }
 })
 </script>

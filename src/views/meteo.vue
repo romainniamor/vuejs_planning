@@ -24,6 +24,7 @@
       </ul>
     </v-form>
     <div class="meteo-component-wrapper" v-if="weatherData">
+      <br />
       <MeteoHeroBanner
         :temperature="weatherData.current.temp"
         :pressure="weatherData.current.pressure"
@@ -32,13 +33,23 @@
         :humidity="weatherData.current.humidity"
         :icon="weatherData.current.weather[0].icon"
         :city="city"
+        :day="dayDate"
+        :time="dayTime"
       >
       </MeteoHeroBanner>
-      <div class="meteo-card-wrapper">
+      <br />
+      <MeteoChart
+        :chartData="{
+          data: hourlyTemp,
+          label: hourlyHours
+        }"
+      ></MeteoChart>
+      <br />
+      <div class="meteo-cards-wrapper">
         <DailyMeteoCard
-          v-for="(day, index) in weatherData.daily.slice(1, 8)"
+          v-for="(day, index) in weatherData.daily.slice(1)"
           :key="day"
-          :period="index"
+          :dayDate="daysDate[index]"
           :min-temp="day.temp.min"
           :max-temp="day.temp.max"
           :icon="day.weather[0].icon"
@@ -53,9 +64,9 @@ import { ref } from 'vue'
 import axios from 'axios'
 import MeteoHeroBanner from '../components/meteo/meteoHeroBanner.vue'
 import DailyMeteoCard from '../components/meteo/meteoCard.vue'
+import MeteoChart from '../components/meteo/meteoChart.vue'
 
-const mapBoxApiKey =
-  'pk.eyJ1Ijoicm9tYWlubmlhbW9yIiwiYSI6ImNsajQ5ZWFrYzAwNzIzcnRlaGRvc2diYTkifQ.nz4mbhqEK8uvdnw2pxuCpQ'
+const mapBoxApiKey = ''
 
 const searchQuery = ref('')
 const queryTimeout = ref(null)
@@ -64,6 +75,13 @@ const searchError = ref(null)
 const mapBoxSearchResults = ref(null)
 const weatherData = ref(null)
 const city = ref('')
+
+const dayDate = ref('')
+const dayTime = ref('')
+const daysDate = ref('')
+const dayHourly = ref('')
+const hourlyTemp = ref('')
+const hourlyHours = ref([])
 
 // Recherche de la ville avec l'API Mapbox
 const getSearchResults = () => {
@@ -82,7 +100,7 @@ const getSearchResults = () => {
       return
     }
     mapBoxSearchResults.value = null
-  }, 500)
+  }, 300)
 }
 
 const previewCity = (searchResult) => {
@@ -98,14 +116,50 @@ const previewCity = (searchResult) => {
 }
 
 const getWeatherData = async (cityLat, cityLong) => {
+  hourlyHours.value = [] // liste maj
   try {
     console
-    const weatherMapApiKey = 'fe363e73b02953fa60e480d23b5f6009'
+    const weatherMapApiKey = ''
     const res = await axios.get(
-      `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=fe363e73b02953fa60e480d23b5f6009`
+      `https://api.openweathermap.org/data/3.0/onecall?lat=${cityLat}&lon=${cityLong}&exclude={part}&lang=fr&units=metric&appid=`
     )
+
+    console.log('api', res.data)
+
+    //calcul heure locale
+    const localOffset = new Date().getTimezoneOffset() * 60000
+    const utc = res.data.current.dt * 1000 + localOffset
+    res.data.currentTime = utc + 1000 * res.data.timezone_offset
+
+    dayDate.value = new Date(res.data.currentTime).toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long'
+    })
+
+    dayTime.value = new Date(res.data.currentTime).toLocaleTimeString('fr-FR', {
+      timeStyle: 'short'
+    })
+
+    daysDate.value = res.data.daily.slice(1).map((day) => {
+      const date = new Date(day.dt * 1000)
+
+      return date.toLocaleDateString('fr-FR', { weekday: 'short' })
+    })
+
+    res.data.hourly.forEach((hour) => {
+      const utc = hour.dt * 1000 + localOffset
+      hour.currentTime = utc + 1000 * res.data.timezone_offset
+      const localHour = new Date(hour.currentTime).toLocaleTimeString('fr-FR', {
+        timeStyle: 'short'
+      })
+      hourlyHours.value.push(localHour) // On ajoute l'heure locale au tableau des heures pour forunir les label du chart
+    })
+
+    hourlyTemp.value = res.data.hourly.map((hour) => Math.round(hour.temp))
+    console.log('temp', hourlyTemp.value)
+
     weatherData.value = res.data
-    console.log('dataApi:', weatherData.value)
   } catch (error) {
     console.log(error)
   }
@@ -116,7 +170,7 @@ const getWeatherData = async (cityLat, cityLong) => {
 .meteo-view {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+
   width: 1000px;
 }
 
@@ -141,5 +195,12 @@ const getWeatherData = async (cityLat, cityLong) => {
 
 .search-wrapper li {
   cursor: pointer;
+}
+
+.meteo-cards-wrapper {
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
 }
 </style>

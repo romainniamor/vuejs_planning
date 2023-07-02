@@ -11,7 +11,7 @@
     </div>
     <div class="right-col">
       <h4 class="title">{{ city }}</h4>
-      <p class="day-today">{{ dayDate }}</p>
+      <p class="day-today">{{ day }}, {{ time }}</p>
       <p class="meteo-status">{{ weatherStatus }}</p>
     </div>
   </div>
@@ -38,7 +38,9 @@ export default defineComponent({
     weatherStatus: String,
     city: String,
     country: String,
-    icon: String
+    icon: String,
+    day: String,
+    time: String
   },
   data() {
     return {

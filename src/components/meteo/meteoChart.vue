@@ -1,76 +1,101 @@
 <template>
-  <div class="card-box chart-container">
-    <div class="graph-title">
-      <v-btn variant="tonal"> temperatures </v-btn><v-btn variant="tonal"> precipitations </v-btn>
-    </div>
-    <div class="chart-box">
-      <Line :data="chartData" :options="chartOptions" />
-    </div>
+  <div class="card-box graph-temps-container">
+    <h3 class="graph-title">Températures</h3>
+    <Bar :data="formattedChartData" :options="chartOptions" />
   </div>
 </template>
 
 <script>
-import { Line } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  LineElement,
+  BarElement,
   CategoryScale,
   LinearScale
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
-  name: 'meteoChart',
-  components: { Line },
+  name: 'LineChart',
+  components: { Bar },
+
   props: {
-    period: {
-      type: Array,
-      required: true
-    },
-    temperature: {
-      type: Array,
+    chartData: {
+      type: Object,
       required: true
     }
   },
 
   computed: {
-    chartData() {
+    formattedChartData() {
+      const data = this.chartData.data // données recup par api
+      const label = this.chartData.label // données recup par api
+      const sum = data.reduce((a, b) => a + b, 0)
+      const avr = sum / data.length
+
+      // couleur de fond en fonction de la moyenne
+      let bgColor
+      if (avr > 25) {
+        bgColor = '#EF9A9A'
+      } else {
+        bgColor = '#90A4AE'
+      }
+
       return {
-        labels: this.period.map(this.dayFromPeriod),
+        labels: label,
         datasets: [
           {
-            label: 'Temperature',
-            data: this.temperature,
-            backgroundColor: '#78909C',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
+            label: '',
+            backgroundColor: bgColor,
+            data: data,
+            tension: 0.3,
+            fill: true
           }
         ]
       }
     },
     chartOptions() {
-      const data = this.temperature
+      const data = this.chartData.data
       const sum = data.reduce((a, b) => a + b, 0)
-      const moy = sum / data.length
-
-      const suggestedMin = moy - 10
-      const suggestedMax = moy + 10
-
+      const avr = sum / data.length
+      console.log(avr)
       return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: false
+          },
+          tooltip: {
+            enabled: true
+          }
+        },
+        elements: {
+          point: {
+            radius: 0 // largeur pts
+          },
+          line: {
+            borderWidth: 6, // largeur line
+            color: '#546E7A'
+          }
+        },
         scales: {
           y: {
             display: false,
-            suggestedMin: suggestedMin,
-            suggestedMax: suggestedMax,
-            grid: {
-              display: false
-            },
             ticks: {
+              min: avr - 10,
+              max: avr + 10,
+              stepSize: 50,
+              display: true
+            },
+            grid: {
               display: false
             }
           },
@@ -79,53 +104,17 @@ export default {
               display: false
             }
           }
-        },
-        elements: {
-          point: {
-            radius: 5
-          },
-          line: {
-            borderWidth: 4
-          }
-        },
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          tooltip: {
-            enabled: false
-          }
         }
       }
-    }
-  },
-
-  methods: {
-    dayFromPeriod(period) {
-      const today = new Date()
-      const dateFromPeriod = new Date()
-      dateFromPeriod.setDate(today.getDate() + period)
-
-      const jours_semaine = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam']
-
-      return jours_semaine[dateFromPeriod.getDay()]
     }
   }
 }
 </script>
 
 <style>
-.chart-container {
+.graph-temps-container {
   width: 100%;
-}
-.chart-box {
-  width: 100%;
-  height: 250px;
-}
-
-.graph-title {
-  display: flex;
-  gap: 10px;
+  height: 350px;
+  padding: 30px;
 }
 </style>

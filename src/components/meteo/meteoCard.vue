@@ -1,6 +1,6 @@
 <template>
   <div class="card-box meteo-card">
-    <div class="day">{{ this.dayFromPeriod }}</div>
+    <div class="day">{{ dayDate }}</div>
     <img :src="`https://openweathermap.org/img/wn/${this.icon}@2x.png`" />
     <div class="temps">
       <div class="max">{{ Math.round(maxTemp) }}°</div>
@@ -16,11 +16,11 @@ export default {
   },
 
   props: {
-    period: Number,
     maxTemp: Number,
     minTemp: Number,
     weatherStatus: String,
-    icon: String
+    icon: String,
+    dayDate: String
   },
   computed: {
     dayFromPeriod() {
@@ -44,10 +44,6 @@ export default {
 </script>
 
 <style>
-.meteo-card-wrapper {
-  display: flex;
-  flex-direction: row;
-}
 .meteo-card {
   display: flex;
   flex-direction: column;

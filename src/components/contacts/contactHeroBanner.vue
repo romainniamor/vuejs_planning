@@ -1,11 +1,11 @@
 <template>
   <div class="card-box hero-banner-card">
     <div class="left-col">
-      <v-btn variant="tonal"> + Add Contact </v-btn>
+      <v-btn variant="tonal" @click="toContactForm"> + Add Contact </v-btn>
     </div>
     <div class="right-col">
       <h4 class="title">Contacts</h4>
-      <p class="day-today">(20)</p>
+      <p class="lenght-contacts">({{ lenghtContact }})</p>
       <v-form class="contact-search">
         <v-text-field
           v-model="search"
@@ -14,6 +14,7 @@
           type="text"
           variant="outlined"
           clearable
+          hide-details="auto"
           clear-icon="mdi-close-circle"
           @click:clear="clearMessage"
         >
@@ -26,12 +27,21 @@
 <script>
 export default {
   data: () => ({
-    search: ''
+    search: '',
+    model: 'Leider'
   }),
+
+  props: {
+    lenghtContact: Number
+  },
 
   methods: {
     clearMessage() {
       this.search = ''
+    },
+    toContactForm() {
+      this.$router.push({ name: 'add_contact' })
+      console.log('bouton add contact clicked')
     }
   }
 }
